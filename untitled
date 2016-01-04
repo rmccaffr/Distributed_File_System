@@ -1,0 +1,76 @@
+#!/usr/bin/env python
+
+
+import SocketServer 
+from SocketServer import ThreadingMixIn
+import threading 
+import socket
+import time
+from Queue import Queue
+import sys
+import os
+from threading import Lock
+import select
+import pdb
+import collections
+
+class FileServer(TCPSERVER)
+
+DIRECTORY_PATH =  getcwd()
+DIRECTORY_NAME =   "Directory_Server_Files"
+DIRECTORY_LOCATION=os.path.join(DIRECTORY_PATH,DIRECTORY_NAME)
+
+    def __init__(self, folder):
+        self.DIRECTORY_LOCATION = os.path.join(self.DIRECTORY_NAME, str(self.FOLDER))
+
+    def handler(self):
+        self.request.setblocking(0)
+        timeout_in_seconds=0.1
+        data = ''
+        while "\n\n" not in data:
+            ready = select.select([self.request], [], [], timeout_in_seconds)
+            if ready[0]:
+                d = self.request.recv(4096)
+                data += d
+                if len(d) < 4096:
+                    break
+        print data
+        if data.startswith("UPLOAD:"):
+            self.update(data,request)
+
+        elif data.startswith("DOWNLOAD:"):
+            self.download(request,data)
+
+        elif data.startswith("UPDATE:"):
+            self.update(data,request)
+
+
+    def update(self,data,request):
+        self.write(data)
+        request.sendall(UPDATE_RESPONSE)
+
+    def download(self,data,request):
+        request = data.splitlines()
+        filename = request[0].split[1]
+        path = os.path.join(self.DIRECTORY_LOCATION, filename)
+        file_handle = open(path, "w+")
+        response=file_handle.read()
+        response= base64.b64encode(response)
+        request.sendall(response)
+
+    def update(self,data,request):
+        self.write(data)
+        request.sendall(UPDATE_RESPONSE)
+
+    def write(self, text):
+        # Function that process an update/upload request and writes data to the server
+        request = text.splitlines()
+        filename = request[0].split[1]
+        data = request[1:]
+        data = base64.b64decode(data)
+
+        path = os.path.join(self.DIRECTORY_LOCATION, filename)
+        file_handle = open(path, "w+")
+        file_handle.write(data)
+        #return filename, data
+
